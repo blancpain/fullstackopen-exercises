@@ -4,6 +4,7 @@ import PersonForm from "./components/PersonForm";
 import Person from "./components/Person";
 import Persons from "./components/Persons";
 import personServices from "./services/personServices";
+import Notification from "./components/Notification";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -11,6 +12,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
   const [filteredNumbers, setFilteredNumbers] = useState([]);
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     personServices.getAll().then((initialData) => setPersons(initialData));
@@ -47,6 +49,11 @@ const App = () => {
       setNewName("");
       setNewNumber("");
     });
+
+    setNotification(`Added ${newPerson.name}`);
+    setTimeout(() => {
+      setNotification(null);
+    }, 5000);
   };
 
   const handleNumberUpdate = (existingPerson) => {
@@ -65,6 +72,20 @@ const App = () => {
         );
         setNewName("");
         setNewNumber("");
+
+        setNotification(`Changed number for ${updatedPerson.name}`);
+        setTimeout(() => {
+          setNotification(null);
+        }, 5000);
+      })
+      .catch(() => {
+        setNotification(
+          `${updatedPerson.name} has already been removed from the server`
+        );
+        setTimeout(() => {
+          setNotification(null);
+        }, 5000);
+        setPersons(persons.filter((person) => person.id !== updatedPerson.id));
       });
   };
 
@@ -90,8 +111,7 @@ const App = () => {
 
     if (window.confirm(`Delete ${selectedPerson.name}?`)) {
       personServices.remove(id).then(() => {
-        setPersons(persons.filter((person) => person.id !== id));
-        personServices.getAll().then((updatedData) => setPersons(updatedData));
+        setPersons(persons.filter((person) => person.id !== Number(id)));
       });
     } else {
       return;
@@ -121,6 +141,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification} />
       <Filter search={search} handleSearch={handleSearch} />
       <h2>Add a new</h2>
       <PersonForm
