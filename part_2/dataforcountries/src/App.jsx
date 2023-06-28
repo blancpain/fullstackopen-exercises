@@ -1,17 +1,31 @@
 import { useEffect, useState } from "react";
 import countryServices from "./services/countryServices";
+import weatherServices from "./services/weatherServices";
 import Country from "./components/Country";
 
 function App() {
   const [allCountries, setAllCountries] = useState(null);
   const [filteredCountries, setFilteredCountries] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState(null);
+  const [weather, setWeather] = useState(null);
+
+  //  const iconURL = `https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`;
 
   useEffect(() => {
     countryServices.getAll().then((data) => {
       setAllCountries(data);
     });
   }, []);
+
+  //TODO - change below to set weather state and then show all details...also consider refactoring handlesearch - do we need filteredcoutnries?
+
+  useEffect(() => {
+    if (selectedCountry) {
+      weatherServices
+        .get(selectedCountry.capital)
+        .then((response) => console.log(response));
+    }
+  }, [selectedCountry]);
 
   const handleSearch = (e) => {
     const { value } = e.target;
@@ -26,6 +40,11 @@ function App() {
 
       setSelectedCountry(null);
       setFilteredCountries([...currentFilteredCountries]);
+
+      // use current array because filteredCountries might not be updated yet due to async nature of state setting
+      if (currentFilteredCountries.length === 1) {
+        setSelectedCountry(currentFilteredCountries[0]);
+      }
     }
   };
 
