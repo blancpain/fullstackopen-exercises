@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import countryServices from "./services/countryServices";
 import weatherServices from "./services/weatherServices";
 import Country from "./components/Country";
+import Weather from "./components/Weather";
 
 function App() {
   const [allCountries, setAllCountries] = useState(null);
@@ -9,21 +10,17 @@ function App() {
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [weather, setWeather] = useState(null);
 
-  //  const iconURL = `https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`;
-
   useEffect(() => {
     countryServices.getAll().then((data) => {
       setAllCountries(data);
     });
   }, []);
 
-  //TODO - change below to set weather state and then show all details...also consider refactoring handlesearch - do we need filteredcoutnries?
-
   useEffect(() => {
     if (selectedCountry) {
       weatherServices
         .get(selectedCountry.capital)
-        .then((response) => console.log(response));
+        .then((data) => setWeather(data));
     }
   }, [selectedCountry]);
 
@@ -33,11 +30,13 @@ function App() {
     if (value === "") {
       setFilteredCountries([]);
       setSelectedCountry(null);
+      setWeather(null);
     } else {
       const currentFilteredCountries = allCountries.filter((country) => {
         return country.name.common.toLowerCase().includes(value.toLowerCase());
       });
 
+      setWeather(null);
       setSelectedCountry(null);
       setFilteredCountries([...currentFilteredCountries]);
 
@@ -70,12 +69,14 @@ function App() {
     <div className="content">
       <span>find countries</span>
       <input type="text" onChange={handleSearch} />
-      {filteredCountries.length === 1 ? (
-        <Country fullData={filteredCountries[0]} />
+
+      {selectedCountry ? (
+        <Country fullData={selectedCountry} />
       ) : (
         allFilteredCountries
       )}
-      {selectedCountry && <Country fullData={selectedCountry} />}
+      <br />
+      {weather && <Weather data={weather} />}
     </div>
   );
 }
