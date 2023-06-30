@@ -143,7 +143,7 @@ const App = () => {
       <h2>Phonebook</h2>
       <Notification message={notification} />
       <Filter search={search} handleSearch={handleSearch} />
-      <h2>Add a new</h2>
+      <h2>Add a new person</h2>
       <PersonForm
         newName={newName}
         newNumber={newNumber}
