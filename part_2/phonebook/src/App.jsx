@@ -44,16 +44,28 @@ const App = () => {
       number: newNumber,
     };
 
-    personServices.create(newPerson).then((newData) => {
-      setPersons([...persons, newData]);
-      setNewName("");
-      setNewNumber("");
-    });
-
-    setNotification(`Added ${newPerson.name}`);
-    setTimeout(() => {
-      setNotification(null);
-    }, 5000);
+    personServices
+      .create(newPerson)
+      .then((newData) => {
+        setPersons([...persons, newData]);
+        setNewName("");
+        setNewNumber("");
+        setNotification(`Added ${newPerson.name}`);
+        setTimeout(() => {
+          setNotification(null);
+        }, 5000);
+      })
+      .catch((error) => {
+        const errorMsg = error.response.data.error;
+        setNotification(
+          errorMsg.includes("name")
+            ? `Cannot add ${newPerson.name}, name needs to be longer than 3 characters`
+            : `Please enter a valid phone number. Numbers need to be at least 8 digits long with the following format: 123-12345`
+        );
+        setTimeout(() => {
+          setNotification(null);
+        }, 5000);
+      });
   };
 
   const handleNumberUpdate = (existingPerson) => {

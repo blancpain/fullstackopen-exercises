@@ -1,12 +1,23 @@
 export default function Notification({ message }) {
   if (message === null) return null;
 
-  //TODO - control the state here based on msg.includes...
+  let colorMsg = "green";
+  let borderMsg = "2px solid green";
+
+  if (
+    message.includes("removed") ||
+    message.includes("Cannot") ||
+    message.includes("valid")
+  ) {
+    colorMsg = "red";
+    borderMsg = "2px solid red";
+  }
+
   const notificationStyles = {
     backgroundColor: "lightgray",
     fontSize: 25,
-    color: message.includes("removed") ? "red" : "green",
-    border: message.includes("removed") ? "2px solid red" : "2px solid green",
+    color: colorMsg,
+    border: borderMsg,
     padding: 5,
     marginBottom: 25,
   };
