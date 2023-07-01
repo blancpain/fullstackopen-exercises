@@ -63,7 +63,7 @@ const App = () => {
     };
 
     personServices
-      .update(Number(updatedPerson.id), updatedPerson)
+      .update(updatedPerson.id, updatedPerson)
       .then((returnedPerson) => {
         setPersons(
           persons.map((person) =>
@@ -107,11 +107,11 @@ const App = () => {
   const handleDelete = (e) => {
     const { name: id } = e.target;
 
-    const selectedPerson = persons.find((person) => person.id === Number(id));
+    const selectedPerson = persons.find((person) => person.id === id);
 
     if (window.confirm(`Delete ${selectedPerson.name}?`)) {
       personServices.remove(id).then(() => {
-        setPersons(persons.filter((person) => person.id !== Number(id)));
+        setPersons(persons.filter((person) => person.id !== id));
       });
     } else {
       return;
