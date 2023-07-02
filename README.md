@@ -7,3 +7,7 @@
 | 0    | ✅     |
 | 1    | ✅     |
 | 2    | ✅     |
+| 3    | ✅     |
+
+
+Part 3: https://github.com/blancpain/fullstackopen-exercises-part-3
