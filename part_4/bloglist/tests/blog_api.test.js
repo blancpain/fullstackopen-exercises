@@ -51,6 +51,37 @@ test("a specific author is within the returned blogs", async () => {
   expect(author).toContain("Michael Chan");
 });
 
+test("blog posts have an 'id' property", async () => {
+  const response = await api.get("/api/blogs");
+  const blogOne = response.body[0];
+
+  expect(blogOne.id).toBeDefined();
+});
+
+test("a blog can be added correctly", async () => {
+  const newBLog = {
+    _id: "5a422ba71b54a676234d17fb",
+    title: "Testing rocks",
+    author: "Yasen Dimitrov",
+    url: "https://www.someURL.com",
+    likes: 50,
+    __v: 0,
+  };
+
+  await api
+    .post("/api/blogs")
+    .send(newBLog)
+    .expect(201)
+    .expect("Content-Type", /application\/json/);
+
+  const response = await api.get("/api/blogs");
+
+  const contents = response.body.map((r) => r.title);
+
+  expect(response.body).toHaveLength(initialBlogs.length + 1);
+  expect(contents).toContain("Testing rocks");
+});
+
 afterAll(async () => {
   await mongoose.connection.close();
 });
