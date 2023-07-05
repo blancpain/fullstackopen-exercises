@@ -5,7 +5,15 @@ const blogSchema = new mongoose.Schema({
   author: String,
   url: String,
   likes: Number,
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
 });
+
+// below transform option is applied every time we
+// convert a document to JSON (i.e. in tests or in our routes responses)
+// it's not automatically applied on all documents in the DB...
 
 blogSchema.set("toJSON", {
   transform: (document, returnedObject) => {
