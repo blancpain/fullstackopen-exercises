@@ -1,18 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import Notification from "./components/Notification";
+import LoginForm from "./components/LoginForm";
+import BlogForm from "./components/BlogForm";
+import Togglable from "./components/Togglable";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
   const [notification, setNotification] = useState(null);
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
+  const blogFormRef = useRef();
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -28,76 +27,19 @@ const App = () => {
     }
   }, []);
 
-  const loginForm = () => {
-    return (
-      <form onSubmit={handleLogin}>
-        <div>
-          username{" "}
-          <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </div>
-        <div>
-          password{" "}
-          <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <br />
-        <button type="submit">login</button>
-      </form>
-    );
-  };
-
-  const blogForm = () => {
-    return (
-      <form onSubmit={handleSubmit}>
-        <h2>create new</h2>
-        <div>
-          title{" "}
-          <input
-            type="text"
-            value={title}
-            name="Title"
-            onChange={({ target }) => setTitle(target.value)}
-          />
-        </div>
-        <div>
-          author{" "}
-          <input
-            type="text"
-            value={author}
-            name="Author"
-            onChange={({ target }) => setAuthor(target.value)}
-          />
-        </div>
-        <div>
-          url{" "}
-          <input
-            type="text"
-            value={url}
-            name="URL"
-            onChange={({ target }) => setUrl(target.value)}
-          />
-        </div>
-        <br />
-        <button type="submit">create</button>
-        <br />
-        <br />
-      </form>
-    );
-  };
-
   const allBlogs = () => {
-    const currentBlogs = blogs.map((blog) => (
-      <Blog key={blog.id} blog={blog} />
-    ));
+    const currentBlogs = blogs
+      .sort((a, b) => b.likes - a.likes)
+      .map((blog) => (
+        <Blog
+          key={blog.id}
+          blog={blog}
+          updateBlog={updateBlog}
+          loggedUser={user}
+          deleteBlog={deleteBlog}
+        />
+      ));
+
     return <div>{currentBlogs}</div>;
   };
 
@@ -109,23 +51,12 @@ const App = () => {
     );
   };
 
-  const clearBlogForm = () => {
-    setAuthor("");
-    setTitle("");
-    setUrl("");
-  };
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-
+  const login = async (credentials) => {
     try {
-      const user = await loginService.login({ username, password });
-
+      const user = await loginService.login(credentials);
       window.localStorage.setItem("loggedUser", JSON.stringify(user));
       blogService.setToken(user.token);
       setUser(user);
-      setUsername("");
-      setPassword("");
     } catch (err) {
       setNotification({ message: "Wrong username or password", type: "error" });
       setTimeout(() => {
@@ -139,24 +70,64 @@ const App = () => {
     setUser(null);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const createBlog = async (blogObject) => {
+    blogFormRef.current.toggleVisibility();
+    const createdBlog = await blogService.create(blogObject);
 
-    const newBlog = {
-      title,
-      author,
-      url,
+    // adding username below since the mongoose populate() only gets called on GET
+    // requests so username won't be populated until after refresh
+    // potential more elegant solution - call populate on puts/deletes as well?
+    const blogWithAddedName = {
+      ...createdBlog,
+      creator: { name: user.name, username: user.username },
     };
-
-    const createdBlog = await blogService.create(newBlog);
-    setBlogs([...blogs, createdBlog]);
-    clearBlogForm();
+    setBlogs([...blogs, blogWithAddedName]);
     setNotification({
-      message: `A new blog ${newBlog.title} by ${newBlog.author} added`,
+      message: `A new blog ${blogObject.title} by ${blogObject.author} added`,
     });
     setTimeout(() => {
       setNotification(null);
     }, 5000);
+  };
+
+  const updateBlog = async (e) => {
+    e.preventDefault();
+    const { name: targetedBlogId } = e.target;
+
+    const targetedBlog = blogs.find((blog) => blog.id === targetedBlogId);
+    const updatedLikes = targetedBlog.likes + 1;
+
+    const updatedBlog = {
+      title: targetedBlog.title,
+      author: targetedBlog.author,
+      url: targetedBlog.url,
+      likes: updatedLikes,
+    };
+
+    await blogService.update(targetedBlogId.toString(), updatedBlog);
+
+    setBlogs((prevState) =>
+      prevState.map((blog) => {
+        return blog.id === targetedBlogId
+          ? { ...blog, likes: updatedLikes }
+          : blog;
+      })
+    );
+  };
+
+  const deleteBlog = async (e) => {
+    e.preventDefault();
+    const { name: targetedBlogId } = e.target;
+    const targetedBlog = blogs.find((blog) => blog.id === targetedBlogId);
+
+    if (
+      window.confirm(
+        `Remove blog ${targetedBlog.title} by ${targetedBlog.author}`
+      )
+    ) {
+      await blogService.remove(targetedBlogId.toString());
+      setBlogs(blogs.filter((blog) => blog.id !== targetedBlogId));
+    }
   };
 
   return (
@@ -164,8 +135,18 @@ const App = () => {
       <h2>Blogs</h2>
       <Notification notification={notification} />
       {user !== null && loginStatus()}
-      {user !== null && blogForm()}
-      {user === null ? loginForm() : allBlogs()}
+      {user !== null && (
+        <Togglable buttonLabel="new blog" ref={blogFormRef}>
+          <BlogForm createBlog={createBlog} />
+        </Togglable>
+      )}
+      {user === null ? (
+        <Togglable buttonLabel="log in">
+          <LoginForm login={login} />
+        </Togglable>
+      ) : (
+        allBlogs()
+      )}
     </div>
   );
 };
