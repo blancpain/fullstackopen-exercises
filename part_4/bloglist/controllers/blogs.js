@@ -52,20 +52,42 @@ blogsRouter.delete(
   }
 );
 
-blogsRouter.put("/:id", async (request, response) => {
+blogsRouter.put("/:id", middleware.userExtractor, async (request, response) => {
   const body = request.body;
-  const blog = {
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes,
-  };
+  const user = request.user;
 
-  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {
-    new: true,
-  });
+  // check if blog exists first
+  const targetedBlog = await Blog.findById(request.params.id);
 
-  response.json(updatedBlog);
+  if (!targetedBlog) {
+    return response.status(404).json({ error: "blog not found" });
+  }
+
+  if (!body.url) {
+    response.status(400).json({ error: "url missing" });
+  } else if (!body.title) {
+    response.status(400).json({ error: "title missing" });
+  } else {
+    const blog = {
+      title: body.title,
+      author: body.author,
+      url: body.url,
+      likes: body.likes,
+      user: user.id,
+    };
+
+    const blogToBeUpdated = await Blog.findByIdAndUpdate(
+      request.params.id,
+      blog,
+      {
+        new: true,
+        runValidators: true,
+        context: "query",
+      }
+    );
+
+    response.json(blogToBeUpdated);
+  }
 });
 
 module.exports = blogsRouter;
