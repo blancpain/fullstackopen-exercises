@@ -23,14 +23,16 @@ export default function BlogForm({ createBlog }) {
   };
 
   return (
-    <form onSubmit={addBlog}>
+    <form onSubmit={addBlog} data-testid="blog-form">
       <h2>create new</h2>
       <div>
         title{" "}
         <input
           type="text"
           value={title}
+          id="title"
           name="Title"
+          placeholder="title"
           onChange={({ target }) => setTitle(target.value)}
         />
       </div>
@@ -40,6 +42,8 @@ export default function BlogForm({ createBlog }) {
           type="text"
           value={author}
           name="Author"
+          id="author"
+          placeholder="author"
           onChange={({ target }) => setAuthor(target.value)}
         />
       </div>
@@ -49,11 +53,15 @@ export default function BlogForm({ createBlog }) {
           type="text"
           value={url}
           name="URL"
+          id="url"
+          placeholder="url"
           onChange={({ target }) => setUrl(target.value)}
         />
       </div>
       <br />
-      <button type="submit">create</button>
+      <button type="submit" id="create-blog">
+        create
+      </button>
       <br />
       <br />
     </form>

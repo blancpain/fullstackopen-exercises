@@ -18,9 +18,11 @@ const Blog = ({ blog, updateBlog, loggedUser, deleteBlog }) => {
   if (blog.creator) {
     creatorName = blog.creator.name;
     username = blog.creator.username;
-  } else {
+  } else if (blog.user) {
     creatorName = blog.user.name;
     username = blog.user.username;
+  } else {
+    return;
   }
 
   const additionalDetails = () => {
@@ -29,7 +31,7 @@ const Blog = ({ blog, updateBlog, loggedUser, deleteBlog }) => {
         <div>{blog.url}</div>
         <div>
           likes {blog.likes}{" "}
-          <button name={blog.id} onClick={updateBlog}>
+          <button name={blog.id} onClick={updateBlog} id="like-button">
             like
           </button>
         </div>
@@ -39,6 +41,7 @@ const Blog = ({ blog, updateBlog, loggedUser, deleteBlog }) => {
             name={blog.id}
             onClick={deleteBlog}
             style={{ backgroundColor: "blue", color: "white" }}
+            id="delete-button"
           >
             delete
           </button>
@@ -48,10 +51,13 @@ const Blog = ({ blog, updateBlog, loggedUser, deleteBlog }) => {
   };
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} data-testid="blog-component" id="blog">
       <div>
         {blog.title} {blog.author}{" "}
-        <button onClick={() => setShowDetails(!showDetails)}>
+        <button
+          onClick={() => setShowDetails(!showDetails)}
+          data-testid="view-btn"
+        >
           {showDetails ? "hide" : "view"}
         </button>
       </div>

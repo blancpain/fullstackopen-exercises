@@ -40,7 +40,7 @@ const App = () => {
         />
       ));
 
-    return <div>{currentBlogs}</div>;
+    return <div id="all-blogs">{currentBlogs}</div>;
   };
 
   const loginStatus = () => {

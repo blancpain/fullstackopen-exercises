@@ -18,5 +18,9 @@ export default function Notification({ notification }) {
     marginBottom: 25,
   };
 
-  return <div style={notificationStyles}>{notification.message}</div>;
+  return (
+    <div style={notificationStyles} id="notification">
+      {notification.message}
+    </div>
+  );
 }
