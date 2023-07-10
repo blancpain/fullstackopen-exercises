@@ -2,7 +2,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { vote } from "../reducers/anecdoteReducer";
 
 export default function AnecdoteList() {
-  const anecdotes = useSelector((state) => state);
+  const anecdotes = useSelector(({ search, anecdotes }) => {
+    return anecdotes.filter((anecdote) =>
+      anecdote.content.toLowerCase().includes(search.toLowerCase())
+    );
+  });
+
   const dispatch = useDispatch();
 
   const allAnecdotes = anecdotes
