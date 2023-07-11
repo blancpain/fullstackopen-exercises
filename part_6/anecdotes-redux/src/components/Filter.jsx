@@ -3,10 +3,12 @@ import { useDispatch } from "react-redux";
 
 const Filter = () => {
   const dispatch = useDispatch();
+
   const handleChange = (e) => {
     const { value } = e.target;
     dispatch(search(value));
   };
+
   const style = {
     marginBottom: 10,
   };
