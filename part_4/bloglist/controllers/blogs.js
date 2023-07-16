@@ -11,6 +11,10 @@ blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
   const body = request.body;
   const user = request.user;
 
+  if (!user) {
+    return response.status(401).json({ error: "operation not permitted" });
+  }
+
   if (!body.url) {
     response.status(400).json({ error: "url missing" });
   } else if (!body.title) {
@@ -24,10 +28,17 @@ blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
       user: user.id,
     });
 
-    const savedBlog = await blog.save();
+    blog.user = user._id;
+    let savedBlog = await blog.save();
 
     user.blogs = [...user.blogs, savedBlog._id];
     await user.save();
+
+    // we do the below so that the returned object shows the user immediately
+    // on render without having to refresh the page and send another GET
+    // request which will populate the user...
+    savedBlog = await Blog.findById(savedBlog._id).populate("user");
+
     response.status(201).json(savedBlog);
   }
 });
@@ -76,7 +87,7 @@ blogsRouter.put("/:id", middleware.userExtractor, async (request, response) => {
       user: user.id,
     };
 
-    const blogToBeUpdated = await Blog.findByIdAndUpdate(
+    let blogToBeUpdated = await Blog.findByIdAndUpdate(
       request.params.id,
       blog,
       {
@@ -85,6 +96,8 @@ blogsRouter.put("/:id", middleware.userExtractor, async (request, response) => {
         context: "query",
       }
     );
+
+    blogToBeUpdated = await Blog.findById(blogToBeUpdated._id).populate("user");
 
     response.json(blogToBeUpdated);
   }
