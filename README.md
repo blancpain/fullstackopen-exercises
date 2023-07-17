@@ -11,6 +11,7 @@
 | 4    | ✅     |
 | 5    | ✅     |
 | 6    | ✅     |
+| 7    | ✅     |
 
 
 Part 3: https://github.com/blancpain/fullstackopen-exercises-part-3
