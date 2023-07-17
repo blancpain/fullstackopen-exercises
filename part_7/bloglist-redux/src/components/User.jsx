@@ -1,15 +1,21 @@
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import { getAllUsers } from '../reducers/usersReducer';
 
 export default function User() {
   const { id } = useParams();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getAllUsers());
+  }, [dispatch]);
 
   const allUsers = useSelector(({ users }) => {
     return users;
   });
 
   const selectedUser = allUsers.find((user) => user.id === id);
-
   return (
     selectedUser && (
       <>

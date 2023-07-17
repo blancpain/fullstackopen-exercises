@@ -10,25 +10,45 @@ const blogSlice = createSlice({
       const { id } = action.payload;
       return state.map((a) => (a.id !== id ? a : action.payload));
     },
+
     appendBlog(state, action) {
       state.push(action.payload);
     },
+
     popBlog(state, action) {
       const { id } = action.payload;
       return state.filter((a) => a.id !== id);
     },
+
     setBlogs(state, action) {
       return action.payload;
+    },
+
+    appendComment(state, action) {
+      const { id } = action.payload;
+      return state.map((a) => (a.id !== id ? a : action.payload));
     },
   },
 });
 
-export const { appendBlog, incrementLikes, setBlogs, popBlog } = blogSlice.actions;
+export const { appendBlog, incrementLikes, setBlogs, popBlog, appendComment } = blogSlice.actions;
 
 export const initializeBlogs = () => {
   return async (dispatch) => {
     const blogs = await blogServices.getAll();
     dispatch(setBlogs(blogs));
+  };
+};
+
+export const addComment = (targetedBlog, comment) => {
+  return async (dispatch) => {
+    try {
+      const updatedBlog = await blogServices.addComment(targetedBlog.id, comment);
+
+      dispatch(appendComment(updatedBlog));
+    } catch (e) {
+      dispatch(setNotification('Comments cannot be blank. Please try again.', 5, 'error'));
+    }
   };
 };
 
@@ -47,6 +67,7 @@ export const addBlog = (contents) => {
 export const registerLike = (blogToUpdate) => {
   return async (dispatch) => {
     const updatedBlog = await blogServices.update(blogToUpdate.id, blogToUpdate);
+
     dispatch(incrementLikes(updatedBlog));
   };
 };

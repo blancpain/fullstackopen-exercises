@@ -1,35 +1,33 @@
 import { useSelector, useDispatch } from 'react-redux';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { registerLike, removeBlog } from '../reducers/blogsReducer';
+import { registerLike, removeBlog, addComment } from '../reducers/blogsReducer';
+import { nanoid } from '@reduxjs/toolkit';
 
 /* eslint-disable react/prop-types */
 const Blog = () => {
+  const [comment, setComment] = useState('');
   const dispatch = useDispatch();
-
   const { id } = useParams();
 
   const user = useSelector(({ user }) => {
     return user;
   });
 
-  //TODO - implement redirect when logging out...
   //! figure out how to fix the refresh issue
   const blogs = useSelector(({ blogs }) => {
     return blogs;
   });
 
   const selectedBlog = blogs.find((blog) => blog.id === id);
-
   if (!selectedBlog) return null;
 
-  //! can refactor below as we don't need to find the blog anymore?
   const updateBlog = async (e) => {
     e.preventDefault();
-    const { name: targetedBlogId } = e.target;
 
+    const { name: targetedBlogId } = e.target;
     const targetedBlog = blogs.find((blog) => blog.id === targetedBlogId);
     const updatedLikes = targetedBlog.likes + 1;
-
     const updatedBlog = {
       id: targetedBlog.id,
       title: targetedBlog.title,
@@ -41,9 +39,9 @@ const Blog = () => {
     dispatch(registerLike(updatedBlog));
   };
 
-  //! can refactor below as we don't need to find the blog anymore?
   const deleteBlog = async (e) => {
     e.preventDefault();
+
     const { name: targetedBlogId } = e.target;
     const targetedBlog = blogs.find((blog) => blog.id === targetedBlogId);
 
@@ -52,10 +50,15 @@ const Blog = () => {
     }
   };
 
+  const submitComment = (e) => {
+    e.preventDefault();
+    dispatch(addComment(selectedBlog, comment));
+    setComment('');
+  };
+
   return (
     <div id="blog">
       <h2>{selectedBlog.title}</h2>
-
       <div>{selectedBlog.url}</div>
       <div>
         {selectedBlog.likes} likes{' '}
@@ -75,6 +78,27 @@ const Blog = () => {
             delete
           </button>
         )}
+
+        <h2>Comments</h2>
+        <form onSubmit={submitComment}>
+          <span>
+            <input
+              type="text"
+              value={comment}
+              id="title"
+              name="Title"
+              placeholder="comment"
+              onChange={({ target }) => setComment(target.value)}
+            />
+          </span>
+          <button type="submit">add comment</button>
+          <br />
+        </form>
+        <ul>
+          {selectedBlog.comments.map((comment) => {
+            return <li key={nanoid()}>{comment}</li>;
+          })}
+        </ul>
       </div>
     </div>
   );

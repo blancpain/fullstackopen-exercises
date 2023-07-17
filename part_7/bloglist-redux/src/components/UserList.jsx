@@ -14,7 +14,6 @@ export default function UserList() {
     return users;
   });
 
-  console.log(allUsers);
   return (
     <div>
       <h2>Users</h2>
