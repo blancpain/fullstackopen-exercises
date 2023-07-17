@@ -6,12 +6,14 @@ export default function Menu({ loggedStatus }) {
   return (
     <div
       style={{
-        backgroundColor: 'gray',
+        backgroundColor: 'lightblue',
         display: 'flex',
         alignItems: 'center',
         height: '30px',
         gap: '1rem',
         marginBottom: '1rem',
+        borderRadius: '8px',
+        padding: '15px',
       }}
     >
       <span>

@@ -1,12 +1,13 @@
 /* eslint-disable react/prop-types */
-import { useState, forwardRef, useImperativeHandle } from "react";
-import PropTypes from "prop-types";
+import { useState, forwardRef, useImperativeHandle } from 'react';
+import PropTypes from 'prop-types';
+import Button from '@mui/material/Button';
 
 const Togglable = forwardRef((props, ref) => {
   const [visible, setVisible] = useState(false);
 
-  const hideWhenVisible = { display: visible ? "none" : "" };
-  const showWhenVisible = { display: visible ? "" : "none" };
+  const hideWhenVisible = { display: visible ? 'none' : '' };
+  const showWhenVisible = { display: visible ? '' : 'none' };
 
   const toggleVisibility = () => {
     setVisible(!visible);
@@ -19,18 +20,22 @@ const Togglable = forwardRef((props, ref) => {
   return (
     <div>
       <div style={hideWhenVisible}>
-        <button onClick={toggleVisibility}>{props.buttonLabel}</button>
+        <Button variant="contained" onClick={toggleVisibility}>
+          {props.buttonLabel}
+        </Button>
       </div>
       <div style={showWhenVisible}>
         {props.children}
-        <button onClick={toggleVisibility}>cancel</button>
+        <Button variant="contained" size="small" onClick={toggleVisibility}>
+          cancel
+        </Button>
       </div>
       <br />
     </div>
   );
 });
 
-Togglable.displayName = "Togglable";
+Togglable.displayName = 'Togglable';
 
 Togglable.propTypes = {
   buttonLabel: PropTypes.string.isRequired,

@@ -18,11 +18,6 @@ export default function routesConfig() {
         <Route index element={<UserList />} />
         <Route path=":id" element={<User />} />
       </Route>
-      {/* <Route path="shop" element={<ShopLayout />}>
-        <Route index element={<Shop />} loader={watchLoader} />
-        <Route path=":id" element={<WatchDetails />} loader={fullDetailsWatchLoader} />
-      </Route>
-      <Route path="contact" element={<Contact />} /> */}
     </Route>
   );
 }

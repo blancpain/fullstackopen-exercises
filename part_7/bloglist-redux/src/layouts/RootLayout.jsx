@@ -7,6 +7,8 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { fetchUser } from '../reducers/userReducer';
 import { useEffect } from 'react';
 import Menu from '../components/Menu';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 
 export default function RootLayout() {
   const dispatch = useDispatch();
@@ -24,7 +26,10 @@ export default function RootLayout() {
   const loginStatus = () => {
     return (
       <p style={{ fontWeight: 'bold' }}>
-        {user.username} logged in <button onClick={handleLogout}>logout</button>
+        {user.username} logged in{' '}
+        <Button size="small" variant="contained" onClick={handleLogout}>
+          logout
+        </Button>
       </p>
     );
   };
@@ -43,7 +48,7 @@ export default function RootLayout() {
 
   return (
     <div>
-      <h2>Blogs</h2>
+      <Typography variant="h2">Blogs</Typography>
       <Notification />
       {user !== null && <Menu loggedStatus={loginStatus} />}
       {user === null ? (
