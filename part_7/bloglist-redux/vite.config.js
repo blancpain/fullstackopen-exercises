@@ -12,6 +12,7 @@ export default defineConfig({
     proxy: {
       "/api/blogs": "http://localhost:3003",
       "/api/login": "http://localhost:3003",
+      "/api/users": "http://localhost:3003",
     },
   },
   plugins: [react()],

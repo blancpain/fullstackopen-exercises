@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import blogServices from '../services/blogs';
+import { setNotification } from './notificationReducer';
 
 const blogSlice = createSlice({
   name: 'blogs',
@@ -33,8 +34,13 @@ export const initializeBlogs = () => {
 
 export const addBlog = (contents) => {
   return async (dispatch) => {
-    const newBlog = await blogServices.create(contents);
-    dispatch(appendBlog(newBlog));
+    try {
+      const newBlog = await blogServices.create(contents);
+      dispatch(appendBlog(newBlog));
+      dispatch(setNotification(`A new blog ${newBlog.title} by ${newBlog.author} added`, 5));
+    } catch (e) {
+      dispatch(setNotification(`Please fill out all fields`, 5, 'error'));
+    }
   };
 };
 

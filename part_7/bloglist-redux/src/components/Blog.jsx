@@ -1,67 +1,81 @@
-import { useState } from "react";
+import { useSelector, useDispatch } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import { registerLike, removeBlog } from '../reducers/blogsReducer';
 
 /* eslint-disable react/prop-types */
-const Blog = ({ blog, updateBlog, loggedUser, deleteBlog }) => {
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
+const Blog = () => {
+  const dispatch = useDispatch();
+
+  const { id } = useParams();
+
+  const user = useSelector(({ user }) => {
+    return user;
+  });
+
+  //TODO - implement redirect when logging out...
+  //! figure out how to fix the refresh issue
+  const blogs = useSelector(({ blogs }) => {
+    return blogs;
+  });
+
+  const selectedBlog = blogs.find((blog) => blog.id === id);
+
+  if (!selectedBlog) return null;
+
+  //! can refactor below as we don't need to find the blog anymore?
+  const updateBlog = async (e) => {
+    e.preventDefault();
+    const { name: targetedBlogId } = e.target;
+
+    const targetedBlog = blogs.find((blog) => blog.id === targetedBlogId);
+    const updatedLikes = targetedBlog.likes + 1;
+
+    const updatedBlog = {
+      id: targetedBlog.id,
+      title: targetedBlog.title,
+      author: targetedBlog.author,
+      url: targetedBlog.url,
+      likes: updatedLikes,
+    };
+
+    dispatch(registerLike(updatedBlog));
   };
 
-  const [showDetails, setShowDetails] = useState(false);
+  //! can refactor below as we don't need to find the blog anymore?
+  const deleteBlog = async (e) => {
+    e.preventDefault();
+    const { name: targetedBlogId } = e.target;
+    const targetedBlog = blogs.find((blog) => blog.id === targetedBlogId);
 
-  let creatorName;
-  let username;
+    if (window.confirm(`Remove blog ${targetedBlog.title} by ${targetedBlog.author}`)) {
+      dispatch(removeBlog(targetedBlog));
+    }
+  };
 
-  if (blog.creator) {
-    creatorName = blog.creator.name;
-    username = blog.creator.username;
-  } else if (blog.user) {
-    creatorName = blog.user.name;
-    username = blog.user.username;
-  } else {
-    return;
-  }
+  return (
+    <div id="blog">
+      <h2>{selectedBlog.title}</h2>
 
-  const additionalDetails = () => {
-    return (
-      <>
-        <div>{blog.url}</div>
-        <div>
-          likes {blog.likes}{" "}
-          <button name={blog.id} onClick={updateBlog} id="like-button">
-            like
-          </button>
-        </div>
-        <div> added by {creatorName} </div>
-        {loggedUser.username === username && (
+      <div>{selectedBlog.url}</div>
+      <div>
+        {selectedBlog.likes} likes{' '}
+        <button name={selectedBlog.id} onClick={updateBlog} id="like-button">
+          like
+        </button>
+      </div>
+      <div>
+        <div> added by {selectedBlog.user.name} </div>
+        {selectedBlog.user.username === user.username && (
           <button
-            name={blog.id}
+            name={selectedBlog.id}
             onClick={deleteBlog}
-            style={{ backgroundColor: "blue", color: "white" }}
+            style={{ backgroundColor: 'blue', color: 'white' }}
             id="delete-button"
           >
             delete
           </button>
         )}
-      </>
-    );
-  };
-
-  return (
-    <div style={blogStyle} data-testid="blog-component" id="blog">
-      <div>
-        {blog.title} {blog.author}{" "}
-        <button
-          onClick={() => setShowDetails(!showDetails)}
-          data-testid="view-btn"
-        >
-          {showDetails ? "hide" : "view"}
-        </button>
       </div>
-      {showDetails && additionalDetails()}
     </div>
   );
 };
