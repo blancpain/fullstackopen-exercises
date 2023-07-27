@@ -12,6 +12,7 @@
 | 5    | ✅     |
 | 6    | ✅     |
 | 7    | ✅     |
-
+| 9    | ✅     |
 
 Part 3: https://github.com/blancpain/fullstackopen-exercises-part-3
+Part 9 (patientor frontend): https://github.com/blancpain/patientor-frontend
