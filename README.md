@@ -13,7 +13,10 @@
 | 6    | ✅     |
 | 7    | ✅     |
 | 9    | ✅     |
+| 13   | ✅     |
 
 Part 3: https://github.com/blancpain/fullstackopen-exercises-part-3 
 
 Part 9 (patientor frontend): https://github.com/blancpain/patientor-frontend
+
+Part 13: https://github.com/blancpain/blogs-postgres-FSO
