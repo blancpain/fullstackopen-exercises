@@ -13,12 +13,15 @@
 | 6    | ✅     |
 | 7    | ✅     |
 | 9    | ✅     |
+| 11   | ✅     |
 | 12   | ✅     |
 | 13   | ✅     |
 
 Part 3: https://github.com/blancpain/fullstackopen-exercises-part-3 
 
 Part 9 (patientor frontend): https://github.com/blancpain/patientor-frontend
+
+Part 11: https://github.com/blancpain/full-stack-open-pokedex and https://github.com/blancpain/fso-part_11_ex11.20
 
 Part 12: https://github.com/blancpain/part12-containers-applications
 
